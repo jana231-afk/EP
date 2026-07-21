@@ -431,8 +431,53 @@ function showView(v){
 }
 
 /* ================= PLAN module ================= */
-const SK={listening:{n:'Listening',c:'var(--listening)',i:'🎧'},reading:{n:'Reading',c:'var(--reading)',i:'📖'},vocab:{n:'Vocabulary',c:'var(--vocab)',i:'🧠'},writing:{n:'Writing',c:'var(--writing)',i:'✍️'},speaking:{n:'Speaking',c:'var(--speaking)',i:'🗣️'},review:{n:'Review',c:'var(--review)',i:'📊'}};
-const RES={
+const SK={listening:{n:'Listening',c:'var(--listening)',i:'🎧'},reading:{n:'Reading',c:'var(--reading)',i:'📖'},vocab:{n:'Vocabulary',c:'var(--vocab)',i:'🧠'},writing:{n:'Writing',c:'var(--writing)',i:'✍️'},speaking:{n:'Speaking',c:'var(--speaking)',i:'🗣️'},review:{n:'Review',c:'var(--review)',i:'📊'},dictation:{n:'Dictation',c:'#ff9800',i:'👂'},essay:{n:'Essay',c:'#9c27b0',i:'📝'},grammar:{n:'Grammar',c:'#00bcd4',i:'📘'}};
+const ESSAYS=[
+{topic:'Climate change and education',prompt:'How can schools teach students about climate change? Write 300 words discussing the importance and methods.'},
+{topic:'Remote work: pros and cons',prompt:'Has remote work improved or harmed work-life balance? Discuss both sides in 300 words.'},
+{topic:'Social media and mental health',prompt:'Is social media responsible for rising anxiety in teens? Argue your position in 300 words with examples.'},
+{topic:'The future of AI in education',prompt:'How will AI change the classroom? Explore both opportunities and dangers in 300 words.'},
+{topic:'Language and cultural identity',prompt:'Does learning a new language change your identity? Write a reflective 300-word essay.'},
+{topic:'Technology and human connection',prompt:'Does technology bring us closer or push us apart? Support your view in 300 words.'},
+{topic:'Gender equality in the workplace',prompt:'What barriers do women still face at work, and how can they be overcome? 300 words.'},
+{topic:'Environmental responsibility and lifestyle',prompt:'Can individual choices really impact the environment? Discuss in 300 words with real examples.'},
+{topic:'Education vs. job skills',prompt:'Should schools focus on academic knowledge or practical skills? Argue your view in 300 words.'},
+{topic:'Migration and belonging',prompt:'What makes a place "home"? Write about cultural migration and identity in 300 words.'},
+{topic:'Mental health awareness',prompt:'Why is mental health still stigmatized? How can we change attitudes? 300 words.'},
+{topic:'The role of news media',prompt:'How much can we trust traditional news? Discuss credibility and bias in 300 words.'},
+{topic:'Artificial intelligence ethics',prompt:'Should AI be regulated? Explore the risks and benefits in a 300-word essay.'},
+{topic:'Urban vs. rural life',prompt:'Which lifestyle is better suited for the future? Compare in 300 words with reasons.'},
+{topic:'Language learning motivation',prompt:'Why do people learn new languages? Discuss personal, professional, and cultural reasons in 300 words.'}
+];
+
+const DICTS=[
+'Listen to a 60-second BBC Learning English clip and write down every word you hear. Check against the transcript.',
+'Find a 90-second TED talk excerpt. Play it 3 times and write what you understand. Compare with subtitles.',
+'Listen to a VOA Learning English article (2 min). Pause after each sentence and write it down.',
+'Play a song at slow speed (use YouTube at 0.75x). Write down the lyrics of one verse.',
+'Listen to a podcast segment (1.5 min) and transcribe it. Focus on linking words and contractions.',
+'Watch a movie scene (1 min) without subtitles. Write down dialogue word-for-word. Check with subtitles.',
+'Listen to a news report (90 sec) and write the main points. Don\'t worry about perfect spelling.',
+'Find a TED talk and pick a 1-minute section. Transcribe it. Notice how native speakers connect words.',
+'Listen to a song (first verse, slow). Write every word including "uh," "um," and contractions.',
+'Play a BBC 6 Minute English episode. Pick one 2-minute segment and transcribe it carefully.',
+'Listen to an interview (1.5 min) and write what the person says. Check your hearing against the video.',
+'Find a short story read aloud. Transcribe the first 2 minutes. Compare with written text if available.',
+'Listen to a podcast about learning English (1 min). Write the main tips mentioned.',
+'Play a YouTube tutorial (1.5 min). Write down the instructions word-for-word as practice.',
+'Listen to a nature documentary clip (1 min). Transcribe the narration. Notice sentence structures.'
+];
+
+const GRAMWEEK={
+0:'Word Order: Subject + Verb + Object',
+1:'Add Detail to Your Sentences',
+2:'Join Ideas: Compound & Complex',
+3:'Avoid Fragments & Run-ons',
+4:'Present Simple vs Continuous',
+5:'Past Simple vs Present Perfect',
+6:'Articles: a / an / the / zero'
+};
+  const RES={
   listening:[{l:'BBC · 6 Minute English',u:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english'},{l:'TED Talks',u:'https://www.ted.com/talks'},{l:'VOA Learning English',u:'https://learningenglish.voanews.com'},{l:'BBC Learning English (YouTube)',u:'https://www.youtube.com/@bbclearningenglish'},{l:'Language Reactor',u:'https://www.languagereactor.com'},{l:"Luke's English Podcast",u:'https://teacherluke.co.uk'}],
   reading:[{l:'News in Levels (graded)',u:'https://www.newsinlevels.com'},{l:'Breaking News English',u:'https://breakingnewsenglish.com'},{l:'BBC News',u:'https://www.bbc.com/news'},{l:'The Guardian',u:'https://www.theguardian.com/international'},{l:'Aeon essays',u:'https://aeon.co/essays'}],
   vocab:[{l:'engVid lessons',u:'https://www.engvid.com'},{l:'Cambridge Dictionary',u:'https://dictionary.cambridge.org'},{l:'Academic Word List',u:'https://www.wgtn.ac.nz/lals/resources/academicwordlist'},{l:'Anki',u:'https://apps.ankiweb.net'},{l:'English with Lucy (YouTube)',u:'https://www.youtube.com/@EnglishwithLucy'}],
@@ -448,9 +493,24 @@ function taskText(s,t){switch(s){case'listening':return["Active listening",`One 
 const cnt={listening:0,reading:0,vocab:0,speaking:0,review:0};
 function pickRes(s){const p=RES[s];const r=p[cnt[s]%p.length];cnt[s]++;return r;}
 const DAYS=[];
-for(let d=1;d<=30;d++){const wd=(d-1)%7,week=Math.min(3,Math.floor((d-1)/7)),topic=TOPICS[(d-1)%TOPICS.length];const tasks=[{skill:'writing',title:'Daily writing',desc:"Write it, leave it, then revise before you submit. First drafts don't make you better — rewriting does.",prompt:PROMPTS[d-1],res:RES.writing[0]}];ROTA[wd].forEach(s=>{const[ti,de]=taskText(s,topic);tasks.push({skill:s,title:ti,desc:de,res:pickRes(s)});});DAYS.push({d,focus:WEEK_FOCUS[week],topic,tasks});}
-const TOTAL=DAYS.reduce((a,x)=>a+x.tasks.length,0);
-
+for(let d=1;d<=30;d++){
+  const wd=(d-1)%7, week=Math.min(3,Math.floor((d-1)/7)), topic=TOPICS[(d-1)%TOPICS.length];
+  const tasks=[
+    {skill:'writing',title:'Daily writing',desc:"Write it, leave it, then revise before you submit. First drafts don't make you better — rewriting does.",prompt:PROMPTS[d-1],res:RES.writing[0]},
+    {skill:'dictation',title:'Daily dictation',desc:"Listen to English audio and write down what you hear. Pause and replay as needed. Builds listening precision.",prompt:DICTS[(d-1)%DICTS.length],res:{l:'BBC Learning English (6 Min)',u:'https://www.bbc.co.uk/learningenglish/english/features/6-minute-english'}}
+  ];
+  if(d%14===1){
+    const essayIdx=Math.floor((d-1)/14)%ESSAYS.length;
+    const ess=ESSAYS[essayIdx];
+    tasks.push({skill:'essay',title:'Academic essay',desc:'A two-week deep-dive essay. Read articles, take notes, then write 300 words on an engaging topic.',prompt:ess.prompt+' Topic: '+ess.topic,res:{l:'Write & Improve',u:'https://writeandimprove.com'}});
+  }
+  if(wd===0){
+    const gramTopic=GRAMWEEK[week%7];
+    tasks.push({skill:'grammar',title:'Weekly grammar focus',desc:`Study and practice one grammar pattern: ${gramTopic}. Open the Grammar tab, take the quiz, and aim for 80%+.`,res:{l:'Grammar tab (in this app)',u:'#'}});
+  }
+  ROTA[wd].forEach(s=>{const[ti,de]=taskText(s,topic);tasks.push({skill:s,title:ti,desc:de,res:pickRes(s)});});
+  DAYS.push({d,focus:WEEK_FOCUS[week],topic,tasks});
+}
 let plan={checks:{},streak:0,lastActive:null}, active=1;
 function todayStr(){const t=new Date();return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate();}
 function yestStr(){const t=new Date(Date.now()-DAY);return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate();}
