@@ -511,6 +511,11 @@ for(let d=1;d<=30;d++){
   ROTA[wd].forEach(s=>{const[ti,de]=taskText(s,topic);tasks.push({skill:s,title:ti,desc:de,res:pickRes(s)});});
   DAYS.push({d,focus:WEEK_FOCUS[week],topic,tasks});
 }
+  ROTA[wd].forEach(s=>{const[ti,de]=taskText(s,topic);tasks.push({skill:s,title:ti,desc:de,res:pickRes(s)});});
+  DAYS.push({d,focus:WEEK_FOCUS[week],topic,tasks});
+}
+const TOTAL=DAYS.reduce((a,x)=>a+x.tasks.length,0);
+  
 let plan={checks:{},streak:0,lastActive:null}, active=1;
 function todayStr(){const t=new Date();return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate();}
 function yestStr(){const t=new Date(Date.now()-DAY);return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate();}
